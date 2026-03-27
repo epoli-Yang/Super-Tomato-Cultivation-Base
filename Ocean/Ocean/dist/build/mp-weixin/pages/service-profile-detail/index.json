@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "服务人员档案",
+  "usingComponents": {
+    "radar-chart": "../../components/radar-chart/index"
+  }
+}
