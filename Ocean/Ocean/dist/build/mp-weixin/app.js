@@ -1,0 +1,1 @@
+"use strict";Object.defineProperty(exports,Symbol.toStringTag,{value:"Module"});const e=require("./common/vendor.js");Math;const n={onLaunch:function(){try{e.index.removeStorageSync("ocean:auth"),e.index.removeStorageSync("ocean:mapState")}catch(n){}},onShow:function(){},onHide:function(){}};function o(){return{app:e.createSSRApp(n)}}o().app.mount("#app"),exports.createApp=o;

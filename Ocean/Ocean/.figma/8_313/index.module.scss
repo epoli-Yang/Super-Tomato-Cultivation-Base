@@ -1,0 +1,267 @@
+* {
+  box-sizing: border-box;
+}
+
+.frame3 {
+  position: relative;
+  border-radius: 60px;
+  background: #ffffff;
+  width: 393px;
+  height: 804px;
+  overflow: hidden;
+
+  .frame22 {
+    position: absolute;
+    top: 15px;
+    left: 17px;
+    border-radius: 40px;
+    width: 358px;
+    height: 772px;
+    overflow: hidden;
+
+    .frame2 {
+      position: absolute;
+      top: -122px;
+      left: -285px;
+      width: 1179px;
+      height: 1461px;
+      background-image: url(../image/mn4r0bvd-4ykacgy.png);
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+
+      .rectangle1 {
+        position: absolute;
+        top: 116px;
+        left: 268px;
+        background: #d9d9d9;
+        width: 393px;
+        height: 98px;
+
+        .rectangle2 {
+          position: absolute;
+          top: 58px;
+          left: 280px;
+          border-radius: 15px;
+          background: #ffffff;
+          width: 84px;
+          height: 29px;
+        }
+
+        .statusBar {
+          display: flex;
+          position: absolute;
+          top: 6px;
+          left: 17px;
+          align-items: flex-start;
+          justify-content: space-between;
+          background: #ffffff;
+          padding: 20px 22px 15px 27px;
+          width: 358px;
+          height: 55px;
+
+          .aTime {
+            width: 54px;
+            height: 20px;
+            text-align: center;
+            line-height: 22px;
+            letter-spacing: -0.41px;
+            color: #000000;
+            font-family: "Alibaba PuHuiTi", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", SimHei, Arial, Helvetica, sans-serif;
+            font-size: 17px;
+            font-weight: 700;
+          }
+
+          .rightSide {
+            display: flex;
+            align-items: center;
+            margin-top: 3px;
+
+            .iconMobileSignal {
+              width: 18px;
+              height: 12px;
+            }
+
+            .wifi {
+              margin-left: 8px;
+              width: 17px;
+              height: 12px;
+            }
+
+            .aStatusBarBattery {
+              margin-left: 7px;
+              width: 27px;
+              height: 13px;
+            }
+          }
+        }
+      }
+
+      .rectangle3 {
+        display: flex;
+        position: absolute;
+        top: 185px;
+        left: 284px;
+        flex-direction: column;
+        align-items: flex-start;
+        border-radius: 19px;
+        box-shadow: 3px 2px 4px 0px #00000040;
+        background: #f7f7f7;
+        padding: 44px 49px 136px 23px;
+        width: 359px;
+        height: 720px;
+
+        .autoWrapper {
+          display: flex;
+          align-items: center;
+          align-self: stretch;
+          justify-content: space-between;
+          padding-right: 107px;
+          padding-left: 0;
+
+          .text {
+            line-height: 19px;
+            letter-spacing: 0;
+            color: #9e9e9e;
+            font-family: "Alibaba PuHuiTi", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", SimHei, Arial, Helvetica, sans-serif;
+            font-size: 14px;
+          }
+        }
+
+        .rectangle13 {
+          margin-top: 3px;
+          margin-left: 141px;
+          border-radius: 4px;
+          background: #26a19a;
+          width: 26px;
+          height: 7px;
+        }
+
+        .text2 {
+          margin: 14px 0px 0px 5px;
+          line-height: 27px;
+          letter-spacing: 0;
+          color: #545454;
+          font-family: "Alibaba PuHuiTi", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", SimHei, Arial, Helvetica, sans-serif;
+          font-size: 20px;
+          font-weight: 500;
+        }
+
+        .xXxxxxxxxxxxxxxxxxxx {
+          margin: 394px 0px 0px 17px;
+          width: 270px;
+          letter-spacing: 0;
+          color: #000000;
+          font-family: "Alibaba PuHuiTi", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", SimHei, Arial, Helvetica, sans-serif;
+          font-size: 14px;
+        }
+      }
+
+      .frame {
+        display: flex;
+        position: absolute;
+        top: 177px;
+        left: 285px;
+        align-items: flex-start;
+        background: #ffffff;
+        padding: 4px 10px 5px;
+        width: 358px;
+        height: 41px;
+
+        .iConArrowChevronLeft {
+          margin-top: 3px;
+          width: 28px;
+          height: 28px;
+        }
+
+        .text3 {
+          margin: 7px 0px 0px 72px;
+          width: 137px;
+          text-align: center;
+          letter-spacing: 0;
+          color: #333333;
+          font-family: "Alibaba PuHuiTi", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", SimHei, Arial, Helvetica, sans-serif;
+          font-size: 16px;
+        }
+
+        .wechatsystemDefault3 {
+          margin-left: 14px;
+          width: 87px;
+          height: 32px;
+        }
+      }
+
+      .line2 {
+        position: absolute;
+        top: 255px;
+        left: 282px;
+        background: #e2e2e2;
+        width: 361px;
+        height: 2px;
+      }
+    }
+
+    .rectangle23 {
+      position: absolute;
+      top: 235px;
+      left: 16px;
+      border-radius: 20px;
+      box-shadow: 0px 4px 4px 0px #00000040;
+      background: #ededed;
+      width: 215px;
+      height: 272px;
+      rotate: -3deg;
+    }
+
+    .rectangle25 {
+      position: absolute;
+      top: 235px;
+      left: 127px;
+      border-radius: 20px;
+      box-shadow: 4px 4px 4px 0px #00000040;
+      background: #efefef;
+      width: 215px;
+      height: 272px;
+      rotate: 177deg;
+    }
+
+    .rectangle24 {
+      position: absolute;
+      top: 213px;
+      left: 41px;
+      border-radius: 20px;
+      box-shadow: 4px 4px 4px 0px #0000004a;
+      background: #d9d9d9;
+      width: 270px;
+      height: 313px;
+    }
+
+    .iConArrowChevronLeft2 {
+      position: absolute;
+      top: 343px;
+      left: 284px;
+      width: 32px;
+      height: 37px;
+      rotate: -180deg;
+    }
+
+    .iConArrowChevronLeft3 {
+      position: absolute;
+      top: 343px;
+      left: 38px;
+      width: 32px;
+      height: 37px;
+    }
+  }
+
+  .h6IkNqzkIq1SwwLemc1W {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 393px;
+    height: 804px;
+    overflow: hidden;
+  }
+}

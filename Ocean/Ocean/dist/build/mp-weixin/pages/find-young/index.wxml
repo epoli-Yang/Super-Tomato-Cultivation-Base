@@ -1,0 +1,1 @@
+<view class="find-page"><view class="find-card"><text class="card-title">寻找心青年</text><text class="card-sub">请输入游客邀请码完成绑定</text><input class="code-input" placeholder="请输入邀请码" placeholder-class="code-placeholder" value="{{a}}" bindinput="{{b}}"/><button class="bind-btn" bindtap="{{c}}">确认绑定</button></view></view>
