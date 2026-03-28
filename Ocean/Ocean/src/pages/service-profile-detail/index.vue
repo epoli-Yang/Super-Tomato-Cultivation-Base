@@ -46,6 +46,7 @@
           </view>
         </view>
       </view>
+      <view class="content-bottom-space"></view>
     </scroll-view>
   </view>
 </template>
@@ -125,7 +126,9 @@ page {
 
 .content {
   flex: 1;
+  height: 100%;
   padding: 16px;
+  box-sizing: border-box;
 }
 
 .brand-card {
@@ -236,5 +239,9 @@ page {
   font-size: 13px;
   line-height: 20px;
   color: rgba(44, 62, 80, 0.9);
+}
+
+.content-bottom-space {
+  height: calc(24px + env(safe-area-inset-bottom));
 }
 </style>

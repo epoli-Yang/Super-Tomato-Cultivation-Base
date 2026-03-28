@@ -35,7 +35,8 @@ export default {
   onLoad(query) {
     const q = query || {};
     if (q.role) this.role = this.safeDecode(q.role);
-    if (q.email) this.email = this.safeDecode(q.email);
+    this.email = q.email ? this.safeDecode(q.email) : DEMO_EMAIL;
+    this.password = DEMO_PASSWORD;
   },
   methods: {
     authRequest(url, data) {

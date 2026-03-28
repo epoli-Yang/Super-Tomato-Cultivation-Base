@@ -8,13 +8,13 @@
           :y="y"
           :style="mapMovableViewStyle"
           :out-of-bounds="false"
-          :inertia="true"
-          :damping="35"
+          :inertia="false"
+          :damping="55"
           :friction="8"
           @change="onDrag"
         >
             <view class="map-stage" @click="handleStageTap">
-              <image src="/static/images/map-background.png" mode="widthFix" class="map-background-image" @load="onMapImageLoad"></image>
+              <image src="/static/images/map-background.jpg" mode="widthFix" class="map-background-image" @load="onMapImageLoad"></image>
               <view class="hotspot-layer">
                 <view
                   v-for="zone in hotspots"
@@ -26,7 +26,7 @@
                 >
                 </view>
               </view>
-              <view v-if="showHotspotTags" class="hotspot-tag-layer">
+              <view class="hotspot-tag-layer">
                 <view
                   v-for="tag in hotspotTags"
                   :key="tag.id"
@@ -35,8 +35,8 @@
                   :style="{ left: tag.left + '%', top: tag.top + '%' }"
                 >
                   <text class="hotspot-tag-name">{{ tag.name }}</text>
-                  <text class="hotspot-tag-caption">友好度</text>
-                  <view class="hotspot-tag-bar">
+                  <text v-if="tag.showFriendly" class="hotspot-tag-caption">友好度</text>
+                  <view v-if="tag.showFriendly" class="hotspot-tag-bar">
                     <view class="hotspot-tag-bar-inner" :class="{ low: tag.isLow }" :style="{ width: tag.percent + '%' }"></view>
                   </view>
                 </view>
@@ -44,10 +44,6 @@
             </view>
         </movable-view>
     </movable-area>
-
-    <view class="tag-toggle" @click.stop="toggleHotspotTags">
-      <text class="tag-toggle-text">{{ showHotspotTags ? '隐藏标签' : '显示标签' }}</text>
-    </view>
 
     <view class="bottom-bubble-slot" :style="{ bottom: bubbleSlotBottom + 'px' }">
       <view v-if="selectedPoi" class="poi-card">
@@ -99,7 +95,9 @@ export default {
       activeZone: null,
       selectedPoiId: null,
       friendlyThreshold: 45,
-      showHotspotTags: true,
+      isLoggedIn: false,
+      hasProfileReady: false,
+      backendFriendlyMap: {},
       itineraryIds: [],
       plannerDisabled: true,
       pois: [
@@ -112,7 +110,8 @@ export default {
         {
           id: '2',
           name: '梦幻水母宫',
-          description: 'XXXXXXXXXXXXXXXXXXXXXXXX',
+          description: '梦幻水母宫是一个专门展示各种水母的室内场馆。馆内整体较暗，主要由展缸内彩色灯光照明，视觉刺激较丰富。若觉得光线晃眼可戴太阳镜；遇到镜面反射区域时，建议放慢脚步确认通道方向。',
+          image: '/static/Jellyfish%20Pavilion/Enter%20the%20Jelly%20Palace.png',
           friendly: 58
         },
         {
@@ -154,7 +153,8 @@ export default {
         {
           id: '9',
           name: '雨林海豚湾',
-          description: 'XXXXXXXXXXXXXXXXXXXXXXXX',
+          description: '热带雨林馆模拟温暖潮湿环境，植物茂密并伴有自然气味。馆内温度较高且湿度明显，可能会播放鸟叫或流水声；若感到闷热，可前往空调休息区稍作调整。',
+          image: '/static/images/Rainforest%20Pavilion.jpg',
           friendly: 61
         },
         {
@@ -172,13 +172,15 @@ export default {
         {
           id: '12',
           name: '白鲸海',
-          description: 'XXXXXXXXXXXXXXXXXXXXXXXX',
+          description: '白鲸海可以近距离观察白鲸，环境整体较昏暗，水面与玻璃可能出现反光。场馆通常较安静，但人多时会有回响。若对光线或声音敏感，可佩戴太阳镜与降噪耳机，并沿隧道匀速前行。',
+          image: '/static/Beluge%20Whale%20Pavilion/enter.jpg',
           friendly: 83
         },
         {
           id: '13',
           name: '企鹅岛',
-          description: 'XXXXXXXXXXXXXXXXXXXXXXXX',
+          description: '企鹅馆温度较低，可看到企鹅在冰块和冷水中活动。场馆光线较亮且可能有反光，进入前建议穿好外套；若对鱼腥味敏感，可佩戴口罩减轻不适。',
+          image: '/static/images/Penguin%20Island.jpg',
           friendly: 59
         },
         {
@@ -226,18 +228,22 @@ export default {
     },
     hotspotTags() {
       const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+      const canShowFriendly = this.hasProfileReady && Object.keys(this.backendFriendlyMap || {}).length > 0;
       return this.hotspots
         .map(z => {
           const poi = this.pois.find(p => String(p.id) === String(z.id));
           if (!poi) return null;
           const rawName = typeof poi.name === 'string' ? poi.name.trim() : '';
           const name = rawName.length > 5 ? rawName.slice(0, 5) + '…' : rawName || '未命名';
-          const score = clamp(Number(poi.friendly), 0, 100);
+          const rawScore = this.getBackendFriendlyScore(String(z.id));
+          const hasFriendly = canShowFriendly && Number.isFinite(rawScore);
+          const score = hasFriendly ? clamp(Number(rawScore), 0, 100) : 0;
           return {
             id: String(z.id),
             left: z.x + z.w / 2,
             top: z.y + z.h / 2,
             name,
+            showFriendly: hasFriendly,
             percent: score,
             isLow: score < this.friendlyThreshold
           };
@@ -275,6 +281,7 @@ export default {
   },
   onShow() {
     this.loadMapState();
+    this.loadFriendlyState();
     this.loadPlannerAccessState();
     this.loadItineraryIds();
     this.bindStorageChange();
@@ -296,8 +303,15 @@ export default {
         this.loadItineraryIds();
       }
       if (e.key === 'ocean:auth') {
+        this.loadFriendlyState();
         this.loadPlannerAccessState();
         this.loadItineraryIds();
+      }
+      if (e.key === 'ocean:backend:venue_friendly_scores') {
+        this.loadFriendlyState();
+      }
+      if (e.key === 'ocean:userdata:lastUpdatedAt' || e.key === 'ocean:sensory_matrix' || e.key === 'ocean:userdata') {
+        this.loadFriendlyState();
       }
     },
     normalizeItineraryId(v) {
@@ -338,8 +352,45 @@ export default {
         this.plannerDisabled = true;
       }
     },
-    toggleHotspotTags() {
-      this.showHotspotTags = !this.showHotspotTags;
+    loadFriendlyState() {
+      this.isLoggedIn = false;
+      this.hasProfileReady = false;
+      this.backendFriendlyMap = {};
+      const parse = (raw) => {
+        try {
+          return raw ? (typeof raw === 'string' ? JSON.parse(raw) : raw) : null;
+        } catch (e) {
+          return null;
+        }
+      };
+      const auth = parse(uni.getStorageSync('ocean:auth'));
+      this.isLoggedIn = !!(auth && auth.loggedIn);
+      const lastUpdatedAt = Number(uni.getStorageSync('ocean:userdata:lastUpdatedAt') || 0);
+      const sensory = parse(uni.getStorageSync('ocean:sensory_matrix')) || parse(uni.getStorageSync('ocean:userdata'));
+      this.hasProfileReady = !!lastUpdatedAt && !!sensory;
+      if (!this.hasProfileReady) return;
+      const backend = parse(uni.getStorageSync('ocean:backend:venue_friendly_scores'));
+      if (!backend) return;
+      const map = {};
+      if (Array.isArray(backend)) {
+        backend.forEach(item => {
+          const id = String(item && (item.id || item.poi_id || '')).trim();
+          const val = Number(item && (item.friendly || item.score || item.percent));
+          if (!id || !Number.isFinite(val)) return;
+          map[id] = val;
+        });
+      } else if (typeof backend === 'object') {
+        Object.keys(backend).forEach(key => {
+          const val = Number(backend[key]);
+          if (Number.isFinite(val)) map[String(key).trim()] = val;
+        });
+      }
+      this.backendFriendlyMap = map;
+    },
+    getBackendFriendlyScore(id) {
+      const key = String(id || '').trim();
+      if (!key) return NaN;
+      return Number(this.backendFriendlyMap[key]);
     },
     loadMapState() {
       const raw = uni.getStorageSync('ocean:mapState');
@@ -396,6 +447,11 @@ export default {
       });
     },
     toggleChatBubble() {
+      if (this.selectedPoi) {
+        this.closePoiSheet();
+        this.isChatBubbleExpanded = true;
+        return;
+      }
       this.isChatBubbleExpanded = !this.isChatBubbleExpanded;
     },
     handleChatSubmit() {
@@ -404,6 +460,7 @@ export default {
       });
     },
     handleStageTap() {
+      this.closePoiSheet();
       this.isChatBubbleExpanded = false;
     },
     handleZoneTap(zone) {
@@ -455,6 +512,11 @@ export default {
         note: item && (item.note || item.description) ? String(item.note || item.description).trim() : '',
         image: item && item.image ? String(item.image).trim() : ''
       })).filter(item => item.id);
+      const rank = (id) => {
+        const n = Number(String(id || '').trim());
+        return Number.isFinite(n) ? n : Number.MAX_SAFE_INTEGER;
+      };
+      normalized.sort((a, b) => rank(a.id) - rank(b.id));
       uni.setStorageSync('ocean:itinerary', JSON.stringify(normalized));
       uni.setStorageSync('ocean:backend:pre_trip', JSON.stringify({
         itinerary: normalized.map((item, index) => ({
@@ -507,11 +569,14 @@ export default {
     onDrag(e) {
       if (!e || !e.detail) return;
       if (e.detail.source === 'update') return;
+      const nextX = Number(e.detail.x);
+      const nextY = Number(e.detail.y);
+      const hasNextPos = Number.isFinite(nextX) && Number.isFinite(nextY);
 
-      if (this.selectedPoiId) {
-        const dx = Math.abs((e.detail.x ?? 0) - this.x);
-        const dy = Math.abs((e.detail.y ?? 0) - this.y);
-        if (dx + dy >= 4) {
+      if (this.selectedPoiId && hasNextPos) {
+        const dx = Math.abs(nextX - this.x);
+        const dy = Math.abs(nextY - this.y);
+        if (dx + dy >= 6) {
           this.closePoiSheet();
         }
       }
@@ -519,8 +584,10 @@ export default {
       if (this.isChatBubbleExpanded) {
         this.isChatBubbleExpanded = false;
       }
-
-      this.handleInteraction(e);
+      if (hasNextPos) {
+        this.x = nextX;
+        this.y = nextY;
+      }
     }
   }
 }
@@ -658,37 +725,23 @@ export default {
   background: rgba(42, 115, 202, 0.14);
 }
 
-.tag-toggle {
-  position: fixed;
-  right: 16rpx;
-  top: calc(16rpx + env(safe-area-inset-top));
-  z-index: 2200;
-  height: 72rpx;
-  padding: 0 22rpx;
-  border-radius: 999rpx;
-  background: rgba(255, 255, 255, 0.86);
-  box-shadow: 0 10rpx 22rpx rgba(0, 0, 0, 0.16);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.tag-toggle-text {
-  font-size: 24rpx;
-  color: rgba(44, 62, 80, 0.86);
-  font-weight: 600;
-}
-
 .mascot-container {
     position: fixed;
     right: -12px;
     bottom: var(--mascot-bottom, 8px);
     z-index: 2000;
+    width: 92px;
+    height: 92px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    overflow: visible;
 }
 
 .mascot-image {
     width: 156px;
     height: 156px;
+    pointer-events: none;
 }
 
 .bottom-bubble-slot {
