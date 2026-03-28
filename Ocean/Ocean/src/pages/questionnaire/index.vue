@@ -52,6 +52,14 @@
 <script setup>
 import { reactive, ref, computed } from 'vue'
 import { sensoryData } from '../../data/questionnaire.js'
+import {
+  demoVisitorProfile,
+  demoSensoryMatrix,
+  demoSensoryObject,
+  demoVenueFriendlyScores,
+  demoItinerary,
+  demoAssistantFaq
+} from '../../data/demo-pack.js'
 import calculateRules from '../../../calculate.json'
 
 const answers = reactive({})
@@ -123,6 +131,52 @@ const syncUserdata = () => {
   return sensoryMatrix
 }
 
+const setDemoAuthProfile = () => {
+  const raw = uni.getStorageSync('ocean:auth')
+  if (!raw) return false
+  let auth = null
+  try {
+    auth = typeof raw === 'string' ? JSON.parse(raw) : raw
+  } catch (e) {
+    auth = null
+  }
+  if (!auth || typeof auth !== 'object' || !auth.loggedIn) return false
+  auth.visitorProfile = {
+    ...(auth.visitorProfile && typeof auth.visitorProfile === 'object' ? auth.visitorProfile : {}),
+    ...demoVisitorProfile
+  }
+  uni.setStorageSync('ocean:auth', JSON.stringify(auth))
+  uni.setStorageSync('ocean:backend:visitor_profile', JSON.stringify({
+    name: auth.visitorProfile.name || '',
+    age: Number(auth.visitorProfile.age) || 0,
+    intro: auth.visitorProfile.intro || ''
+  }))
+  return true
+}
+
+const applyDemoPack = () => {
+  setDemoAuthProfile()
+  uni.setStorageSync('ocean:userdata', demoSensoryMatrix)
+  uni.setStorageSync('ocean:userdata_json', JSON.stringify(demoSensoryMatrix, null, 2))
+  uni.setStorageSync('ocean:sensory_matrix', JSON.stringify(demoSensoryMatrix))
+  uni.setStorageSync('ocean:sensory_object', JSON.stringify(demoSensoryObject))
+  uni.setStorageSync('ocean:backend:asd_details', JSON.stringify({
+    sensory_matrix: demoSensoryMatrix,
+    sensory_object: demoSensoryObject
+  }))
+  uni.setStorageSync('ocean:backend:venue_friendly_scores', JSON.stringify(demoVenueFriendlyScores))
+  uni.setStorageSync('ocean:itinerary', JSON.stringify(demoItinerary))
+  uni.setStorageSync('ocean:backend:pre_trip', JSON.stringify({
+    itinerary: demoItinerary.map((item, index) => ({
+      id: index + 1,
+      name: item.name,
+      note: item.note
+    }))
+  }))
+  uni.setStorageSync('ocean:assistant:demo_faq', JSON.stringify(demoAssistantFaq))
+  uni.setStorageSync('ocean:demo:friendly_enabled', '1')
+}
+
 const questionList = computed(() => {
   return sensoryData.flatMap((dimension) =>
     dimension.questions.map((question) => ({
@@ -167,6 +221,7 @@ const goNextOrSubmit = () => {
   if (isLastQuestion.value) {
     const payload = syncUserdata()
     uni.setStorageSync('ocean:sensoryAnswers', JSON.stringify(answers))
+    applyDemoPack()
     uni.setStorageSync('ocean:userdata:lastUpdatedAt', Date.now())
     uni.showToast({ title: '测评已提交', icon: 'success' })
     console.log('userdata', payload)

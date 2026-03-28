@@ -219,10 +219,10 @@ export default {
       }
       this.editMode = false;
       this.itinerary = [
-        { id: '12', name: '白鲸海', note: '优先选择人少时段观赏，保持可预期节奏', image: '/static/images/beluga.png' },
-        { id: '10', name: '海狮剧场', note: '建议避开高峰场次，减少突发噪音刺激', image: '/static/images/sea-lion.png' },
-        { id: '2', name: '梦幻水母宫', note: '环境相对安静，可作为中段缓冲停留点', image: '/static/images/jellyfish.png' },
-        { id: '5', name: '水豚部落', note: '可在外围低刺激区域停留，逐步适应人流', image: '/static/images/restaurant.png' }
+        { id: '9', name: '雨林海豚湾', note: '先进入温暖环境适应湿度，感觉闷热时去空调区休息。', image: '/static/images/Rainforest%20Pavilion.jpg' },
+        { id: '13', name: '企鹅岛', note: '进入前补充外套，优先在边缘区域观察，减少冷刺激。', image: '/static/images/Penguin%20Island.jpg' },
+        { id: '2', name: '梦幻水母宫', note: '遇到强反光可戴墨镜，沿固定方向慢慢走。', image: '/static/Jellyfish%20Pavilion/Enter%20the%20Jelly%20Palace.png' },
+        { id: '12', name: '白鲸海', note: '在隧道保持匀速步行，必要时使用降噪耳机。', image: '/static/Beluge%20Whale%20Pavilion/enter.jpg' }
       ];
       this.saveItinerary();
       uni.showToast({ title: '已生成行程', icon: 'none' });

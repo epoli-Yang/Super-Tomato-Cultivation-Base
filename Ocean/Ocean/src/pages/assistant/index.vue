@@ -6,7 +6,7 @@
         <view class="bubble" :class="{ 'bubble-user': message.isUser, 'bubble-ai': !message.isUser }">
           <text class="bubble-text">{{ message.text }}</text>
         </view>
-        <image v-if="message.isUser" class="avatar avatar-user" src="/static/images/tourist.png" mode="aspectFit" />
+        <image v-if="message.isUser" class="avatar avatar-user" src="/static/images/mascot.png" mode="aspectFit" />
       </view>
     </scroll-view>
 
@@ -41,6 +41,9 @@ export default {
     return {
       newMessage: '',
       quickPrompts: ['帮我推荐行程', '我想去水母馆，有什么要注意的吗？', '附近的厕所在哪里？'],
+      demoFaq: {
+        nearestToilet: '离你最近的厕所位于梦幻水母宫与白鲸海连廊中段，沿当前路线前行约120米，看到蓝色导视牌后右转即可到达。'
+      },
       messages: [
         {
           text: '我是小白！遇到什么问题都可以点击我来询问哦~',
@@ -58,17 +61,44 @@ export default {
     }
   },
   onLoad(options) {
+      this.loadDemoFaq();
       if (options.initialQuery) {
           this.messages.push({ text: options.initialQuery, isUser: true });
       }
   },
   methods: {
+      loadDemoFaq() {
+        const raw = uni.getStorageSync('ocean:assistant:demo_faq');
+        if (!raw) return;
+        try {
+          const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+          if (parsed && typeof parsed === 'object') {
+            this.demoFaq = { ...this.demoFaq, ...parsed };
+          }
+        } catch (e) {
+        }
+      },
+      buildReply(question) {
+        const text = String(question || '').trim();
+        if (!text) return '收到，正在为您处理...';
+        if (text.includes('厕所') || text.includes('洗手间')) {
+          return this.demoFaq.nearestToilet;
+        }
+        if (text.includes('行程')) {
+          return '已为你准备演示行程：雨林海豚湾 → 企鹅岛 → 梦幻水母宫 → 白鲸海。你可以前往“我的行程”查看完整顺序。';
+        }
+        if (text.includes('水母')) {
+          return '梦幻水母宫光线变化较多，建议佩戴墨镜并放慢脚步，遇到镜面反光可低头看地面短暂调整。';
+        }
+        return '收到，正在为您处理...';
+      },
       sendMessage() {
           if (!this.newMessage.trim()) return;
-          this.messages.push({ text: this.newMessage, isUser: true });
+          const question = this.newMessage;
+          this.messages.push({ text: question, isUser: true });
           this.newMessage = '';
           setTimeout(() => {
-              this.messages.push({ text: '收到，正在为您处理...', isUser: false });
+              this.messages.push({ text: this.buildReply(question), isUser: false });
           }, 1000);
       },
       sendQuickPrompt(text) {
